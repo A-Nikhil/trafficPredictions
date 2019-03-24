@@ -18,7 +18,7 @@ def estimate_coef(x, y):
     return b_0, b_1
 
 
-def time_dependent(x, y):
+def plot(x, y, title, label_x, label_y):
     b = estimate_coef(x, y)
     # plotting the actual points as scatter plot
     plt.scatter(x, y, color="m", marker="o", s=30)
@@ -27,8 +27,9 @@ def time_dependent(x, y):
     # plotting the regression line
     plt.plot(x, y_pred, color="g")
     # putting labels
-    plt.xlabel('x')
-    plt.ylabel('y')
+    plt.xlabel(label_x)
+    plt.ylabel(label_y)
+    plt.title(title)
     # function to show plot
     plt.show()
 
@@ -56,7 +57,7 @@ def time_effect():
     time_prob = float(time_d[new_time]/time_sum)
     x = np.array(list(time_d.keys()))
     y = np.array(list(time_d.values()))
-    time_dependent(x, y)
+    plot(x, y, "Accidents vs Time", "Time", "No. of Accidents")
     return time_prob
 
 
@@ -71,17 +72,29 @@ def alcohol_effect():
 
 def week_effect():
     week_data, times = data.iloc[:, 5], 0
+    weeks = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0}
+    for iterator in week_data:
+        if iterator in range(1, 8):
+            weeks[iterator] = weeks[iterator] + 1
     for x in week_data:
         if day_of_week == x:
             times = times + 1
+    a, b = np.array(list(weeks.keys())), np.array(list(weeks.values()))
+    plot(a, b, "Accidents vs Days of Week", "Week Day", "No. of Accidents")
     return float(times/len(week_data))
 
 
 def light_effect():
     light_data, times = data.iloc[:, 7], 0
+    light = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
+    for iterator in light_data:
+        if iterator in range(1, 7):
+            light[iterator] = light[iterator] + 1
     for x in light_data:
         if x == light_condition:
             times = times + 1
+    a, b = np.array(list(light.keys())), np.array(list(light.values()))
+    plot(a, b, "Accidents vs Light Conditions", "Light Condition", "No. of Accidents")
     return float(times / len(light_data))
 
 
@@ -107,19 +120,20 @@ day_of_week = input("Day of week, Monday being 1 : ")
 light_condition = input(" 1-6 from dawn - dark : ")
 police = input("Was police present ? (No-0 / Yes-1) : ")
 speed_zone = input("Speed Zone Limit (-1 for no limit) : ")
-
-final_chances = [time_effect(), alcohol_effect(), week_effect(),
-                 light_effect(), police_effect(), speed_effect()]
-probability = 1
-for z in final_chances:
-    if z != 0:
-        probability = probability * z
-
-print("Chances of accident = ", format(probability*100, '.2f'), end=" ")
-
-if 0 < probability <= 0.33:
+final_chances = [time_effect(), alcohol_effect(), week_effect(), light_effect(), police_effect(), speed_effect()]
+probability = max(final_chances) + 0.005
+print("\n\nChances of accident = ", format(probability*100, '.2f'), end=" ")
+if 0 < probability <= 0.10:
     print("\n Less chances of accident")
-elif 0.33 < probability <= 0.66:
+elif 0.10 < probability <= 0.20:
     print("\n Medium chances of accident")
 else:
     print("\n High chances of accident")
+factor = final_chances.index(max(final_chances))
+switch = {1: "Drive Safely because you're entering peak traffic time",
+          2: "You should not drink and drive",
+          3: "Fridays - Sundays are busy traffic days",
+          4: "Choose better lighting condition for driving",
+          5: "Police Presence cause considerably less accidents",
+          6: "Drive within the speed-limit to stay safe"}
+print("\n\nOur advice for you : ", switch[factor+1], end="")
