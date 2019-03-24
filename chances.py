@@ -1,6 +1,36 @@
 import pandas as pd
+import numpy as np
 import math
+import matplotlib.pyplot as plt
 data = pd.read_csv('Data_Final.csv')
+
+
+def estimate_coef(x, y):
+    # number of observations/points
+    n = np.size(x)
+    # mean of x and y vector
+    m_x, m_y = np.mean(x), np.mean(y)
+    # calculating cross-deviation and deviation about x
+    SS_xy = np.sum(y * x) - n * m_y * m_x
+    SS_xx = np.sum(x * x) - n * m_x * m_x
+    b_1 = SS_xy / SS_xx
+    b_0 = m_y - b_1 * m_x
+    return b_0, b_1
+
+
+def time_dependent(x, y):
+    b = estimate_coef(x, y)
+    # plotting the actual points as scatter plot
+    plt.scatter(x, y, color="m", marker="o", s=30)
+    # predicted response vector
+    y_pred = b[0] + b[1] * x
+    # plotting the regression line
+    plt.plot(x, y_pred, color="g")
+    # putting labels
+    plt.xlabel('x')
+    plt.ylabel('y')
+    # function to show plot
+    plt.show()
 
 
 def time_effect():
@@ -21,7 +51,12 @@ def time_effect():
             time_d[6] = time_d[6] + 1
     time_sum = sum(time_d.values())
     new_time = math.ceil(int(time[0:2])/4)
+    if new_time > 24:
+        new_time = new_time/10
     time_prob = float(time_d[new_time]/time_sum)
+    x = np.array(list(time_d.keys()))
+    y = np.array(list(time_d.values()))
+    time_dependent(x, y)
     return time_prob
 
 
@@ -80,11 +115,11 @@ for z in final_chances:
     if z != 0:
         probability = probability * z
 
-print(probability)
+print("Chances of accident = ", format(probability*100, '.2f'), end=" ")
 
-if 0 < probability <= 0.25:
-    print("Less chances of accident")
-elif 0.25 < probability <= 0.50:
-    print("Medium chances of accident")
+if 0 < probability <= 0.33:
+    print("\n Less chances of accident")
+elif 0.33 < probability <= 0.66:
+    print("\n Medium chances of accident")
 else:
-    print("High chances of accident")
+    print("\n High chances of accident")
