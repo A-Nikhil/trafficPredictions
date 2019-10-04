@@ -136,4 +136,5 @@ switch = {1: "Drive Safely because you're entering peak traffic time",
           4: "Choose better lighting condition for driving",
           5: "Police Presence cause considerably less accidents",
           6: "Drive within the speed-limit to stay safe"}
-print("\n\nOur advice for you : ", switch[factor+1], end="")
+probFactor = 1;
+print("\n\nOur advice for you : ", switch[factor + probFactor], end="")
